@@ -31,7 +31,7 @@ class AppceleratorCloudServices {
 
     /**
      * Curl Handle for Http request
-     * @var CurlHandle TODO (actual type)
+     * @var cURL Handle
      */
     private $http;
 
@@ -68,6 +68,9 @@ class AppceleratorCloudServices {
     public function __construct($options) {
         if(!isset($options['username']) || !isset($options['password']) || !isset($options['apiKey']))
             throw new InvalidArgumentException('ACS App Key, username, and password are required!');
+
+        if(session_id() == '')
+            session_start();
 
         // process options
         $this->username = $options['username'];
@@ -120,6 +123,10 @@ class AppceleratorCloudServices {
         return $this->uriBase;
     }
 
+    /**
+     * Access the cURL handle to be used in requests.  Set additional options as desired.
+     * @return {cURL handle} cURL handle used for all requests except login.
+     */
     public function getHttp() {
         return $this->http;
     }
@@ -223,7 +230,10 @@ class AppceleratorCloudServices {
 
     /**
      * Execute the request, and process the response.
-     * @param  {CurlHandle} $http Curl handle to be used for request. TODO real obj type tj
+     * @param  {cURL handle} $http Curl handle to be used for request. TODO real obj type tj
+     * @param {string} url for request, including query string
+     * @param {string} method case insensitive http verb
+     * @param {string} data Post data to be sent with request
      * @return {string} JSON response from ACS.
      */
     private function _processRequest($http, $url, $method = 'get', $data = array()) {
@@ -261,11 +271,11 @@ class AppceleratorCloudServices {
         // server often returns status 100 continue, so work backwards...
         $responseArray = explode("\r\n\r\n", $response);
         $body = array_pop($responseArray);
-        $header = array_pop($responseArray);
+        $headers = array_pop($responseArray);
         $body = json_decode($body);
         if($body->meta->status !== 'ok')
             throw new RuntimeException($body->meta->message);
 
-        return $this->returnHeaders ? compact('header', 'body') : $body;
+        return $this->returnHeaders ? compact('headers', 'body') : $body;
     }
 }
