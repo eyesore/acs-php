@@ -152,17 +152,40 @@ class AppceleratorCloudServices {
         return $this->_processRequest($httpLogin, $url, 'post', $data);
     }
 
+    // TODO must login as user being deleted
+    // public function usersDelete($keep_photo = false) {
+    //     $url = $this->_appendApiKey($this->uriBase . '/users/delete.json');
+
+    // }
+
     public function usersQuery($options = array()) {
         $url = $this->_appendApiKey($this->uriBase . '/users/query.json');
         if(!empty($options))
-            $url = $this->_appendParams($url, $params);
+            $url = $this->_appendParams($url, $options);
         return $this->_processRequest($this->http, $url);
     }
 
     public function usersSearch($options = array()) {
         $url = $this->_appendApiKey($this->uriBase . '/users/search.json');  // TODO move appendApiKey to process? tj
         if(!empty($options))
-            $url = $this->_appendParams($url, $params);
+            $url = $this->_appendParams($url, $options);  // TODO move appendParams to process based on method
+        return $this->_processRequest($this->http, $url);
+    }
+
+    /**
+     * Get data for a single user or users
+     * @param  {mixed}  $user_ids Array of user ids, or a single user id (string or int)
+     * @param  {integer} $response_json_depth
+     * @return {object} ACS response
+     */
+    public function usersShow($user_ids, $response_json_depth = 3) {
+        $url = $this->_appendApiKey($this->uriBase . '/users/show.json');
+        $data = array('response_json_depth' => $response_json_depth);
+        if(is_array($userIds))
+            $data['user_ids'] = implode(',', $user_ids);
+        else
+            $data['user_id'] = $user_ids;
+        $url = $this->_appendParams($url, $data);
         return $this->_processRequest($this->http, $url);
     }
 
