@@ -4,12 +4,6 @@
  * To properly secure your account, you should regularly run the companion temp file cleanup script.
  */
 
-function pr($anything) {
-    echo '<pre>';
-    print_r($anything);
-    echo '</pre>';
-}
-
 class AppceleratorCloudServices {
     /**
      * Your App Key
@@ -197,7 +191,7 @@ class AppceleratorCloudServices {
             'payload' => json_encode($payload),
             );
         if(!is_null($ids))
-            $data['ids'] = implode(',', $ids);
+            $data['to_ids'] = implode(',', $ids);
         if(!is_null($friends))
             $data['friends'] = $friends;
 
@@ -210,7 +204,6 @@ class AppceleratorCloudServices {
     private function _prepareCookieJar() {
         if(!empty($_SESSION['AppceleratorCloudServices']['cookie_jar'])) {
             // update modified time so it doesn't get cleaned up
-            pr('Skipping login');
             $this->_cookieJar = $_SESSION['AppceleratorCloudServices']['cookie_jar'];
             return touch($this->_cookieJar);
         }
